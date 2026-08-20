@@ -39,6 +39,33 @@ pipeline {
                 '''
             }
         }
+        
+
+       stage('TestNG Tests') {
+           steps {
+               sh '''
+                   set -e
+
+            echo "===== RUNNING TESTNG TESTS ====="
+
+            cd tests/testng
+
+            mvn clean test
+
+            echo "===== GENERATING HTML TEST REPORT ====="
+
+            mvn surefire-report:report-only
+        '''
+    }
+
+    post {
+        always {
+            junit 'tests/testng/target/surefire-reports/*.xml'
+            archiveArtifacts artifacts: 'tests/testng/target/site/surefire-report.html',
+                             allowEmptyArchive: true
+        }
+    }
+}
 
         stage('ECR Login') {
             steps {

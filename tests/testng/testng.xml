@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="BookMyShow Test Suite">
+    <test name="BookMyShow Smoke Tests">
+        <classes>
+            <class name="com.bookmyshow.BookMyShowSmokeTest"/>
+        </classes>
+    </test>
+</suite>
