@@ -1,0 +1,63 @@
+---
+- name: Deploy BookMyShow to AWS EKS
+  hosts: local
+  connection: local
+  gather_facts: false
+
+  vars:
+    aws_region: "ap-south-1"
+    eks_cluster: "bookmyshow-eks"
+    deployment_name: "bookmyshow-app"
+    container_name: "bookmyshow-app"
+    image: ""
+
+  tasks:
+
+    - name: Validate image variable
+      ansible.builtin.assert:
+        that:
+          - image is defined
+          - image != ""
+          - "'YOUR_CURRENT_BUILD_TAG' not in image"
+        fail_msg: "A valid ECR image must be supplied."
+
+    - name: Update kubeconfig
+      ansible.builtin.command:
+        cmd: aws eks update-kubeconfig --region {{ aws_region }} --name {{ eks_cluster }}
+      changed_when: true
+
+    - name: Deploy image to EKS
+      ansible.builtin.command:
+        cmd: >
+          kubectl set image
+          deployment/{{ deployment_name }}
+          {{ container_name }}={{ image }}
+          -n default
+
+    - name: Wait for rollout
+      ansible.builtin.command:
+        cmd: >
+          kubectl rollout status
+          deployment/{{ deployment_name }}
+          -n default
+          --timeout=5m
+
+    - name: Verify deployment
+      ansible.builtin.command:
+        cmd: kubectl get deployment {{ deployment_name }} -n default
+      register: deployment_status
+      changed_when: false
+
+    - name: Display deployment status
+      ansible.builtin.debug:
+        var: deployment_status.stdout
+
+    - name: Verify pods
+      ansible.builtin.command:
+        cmd: kubectl get pods -n default -o wide
+      register: pods_status
+      changed_when: false
+
+    - name: Display pod status
+      ansible.builtin.debug:
+        var: pods_status.stdout
