@@ -53,6 +53,27 @@ pipeline {
             }
         }
 
+
+        stage('Build & Test') {
+    steps {
+        sh '''
+            set -e
+
+            echo "===== BUILD & TEST ====="
+
+            mvn clean test
+        '''
+    }
+
+    post {
+        always {
+            junit allowEmptyResults: true,
+                  testResults: '**/target/surefire-reports/*.xml'
+        }
+    }
+}
+        
+        
         stage('Build Docker Image') {
             steps {
                 sh '''
