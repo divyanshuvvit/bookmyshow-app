@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven3'
+        jdk 'JDK21'
+    }
     environment {
         AWS_REGION = 'ap-south-1'
         AWS_ACCOUNT_ID = '674650726975'
