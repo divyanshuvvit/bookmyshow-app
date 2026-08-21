@@ -65,7 +65,7 @@ pipeline {
 
             echo "===== BUILD & TEST ====="
 
-
+            cd tests/testng
             mvn clean test
         '''
     }
